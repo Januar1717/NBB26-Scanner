@@ -1,330 +1,210 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#111111">
 <title>Scanner NASDEM BUGAR BERBAGI</title>
-
-<script src="https://unpkg.com/html5-qrcode"></script>
-
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <style>
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  background: #111111;
-  color: #ffffff;
-  font-family: Arial, sans-serif;
-}
-
-header {
-  text-align: center;
-  padding: 22px 15px;
-  background: #000000;
-  border-bottom: 2px solid #D4AF37;
-}
-
-header h1 {
-  color: #D4AF37;
-  font-size: 22px;
-  margin: 0;
-}
-
-header p {
-  font-size: 13px;
-  color: #cccccc;
-  margin-top: 8px;
-}
-
-.container {
-  max-width: 500px;
-  margin: auto;
-  padding: 20px;
-}
-
-.card {
-  background: #1e1e1e;
-  border: 1px solid #333333;
-  border-radius: 15px;
-  padding: 18px;
-  margin-bottom: 18px;
-}
-
-#reader {
-  width: 100%;
-  overflow: hidden;
-  border-radius: 12px;
-}
-
-button {
-  width: 100%;
-  padding: 15px;
-  margin-top: 12px;
-  border: none;
-  border-radius: 9px;
-  background: #D4AF37;
-  color: #111111;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-button:disabled {
-  background: #555555;
-  color: #bbbbbb;
-}
-
-#hasil {
-  display: none;
-  padding: 20px;
-  border-radius: 12px;
-  text-align: center;
-  margin-top: 20px;
-}
-
-#hasil h2 {
-  margin-top: 0;
-  font-size: 22px;
-}
-
-#hasil p {
-  line-height: 1.6;
-  overflow-wrap: anywhere;
-}
-
-.valid {
-  background: #123b22;
-  border: 2px solid #28a745;
-  color: #9cffad;
-}
-
-.invalid {
-  background: #481818;
-  border: 2px solid #dc3545;
-  color: #ffaaaa;
-}
-
-.warning {
-  background: #473817;
-  border: 2px solid #ffc107;
-  color: #ffe08a;
-}
-
-.info {
-  text-align: center;
-  color: #aaaaaa;
-  font-size: 12px;
-  line-height: 1.7;
-  margin-top: 25px;
-}
+:root{color-scheme:dark;--gold:#d4af37;--bg:#101010;--card:#1c1c1c;--muted:#aaa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:#fff;font-family:Arial,Helvetica,sans-serif}
+header{text-align:center;padding:24px 16px 20px;background:#050505;border-bottom:2px solid var(--gold)}
+header h1{margin:0;color:var(--gold);font-size:clamp(20px,5vw,27px);letter-spacing:.5px}
+header p{margin:8px 0 0;color:#ccc;font-size:13px}
+main{width:min(100% - 28px,520px);margin:22px auto}
+.card{background:var(--card);border:1px solid #353535;border-radius:16px;padding:16px;margin-bottom:16px}
+.kicker{font-size:12px;color:var(--gold);font-weight:bold;letter-spacing:1px;margin:0 0 12px}
+#reader{width:100%;overflow:hidden;border-radius:12px;background:#080808;min-height:80px}
+.actions{display:grid;gap:10px;margin-top:14px}
+button{width:100%;padding:15px;border:0;border-radius:10px;background:var(--gold);color:#111;font-size:15px;font-weight:700;cursor:pointer}
+button.secondary{background:#333;color:#fff;border:1px solid #555}
+button:disabled{opacity:.45;cursor:not-allowed}
+#hasil{display:none;padding:18px;border-radius:14px;border:2px solid;text-align:center;overflow-wrap:anywhere}
+#hasil h2{font-size:20px;margin:0 0 10px}
+#hasil p{font-size:15px;line-height:1.6;margin:5px 0}
+#hasil.valid{display:block;background:#102d1b;border-color:#25a85a;color:#c0ffd1}
+#hasil.invalid{display:block;background:#381414;border-color:#d94b4b;color:#ffd0d0}
+#hasil.warning{display:block;background:#3a3014;border-color:#d4af37;color:#ffe7a0}
+.statusnote{font-size:12px;color:var(--muted);line-height:1.6;text-align:center;margin:18px 5px}
+.small{font-size:12px;color:var(--muted);line-height:1.5}
+#reader video{border-radius:12px}
 </style>
 </head>
-
 <body>
-
 <header>
   <h1>NASDEM BUGAR BERBAGI</h1>
   <p>SCANNER TIKET PESERTA UMUM</p>
 </header>
-
-<div class="container">
-
-  <div class="card">
+<main>
+  <section class="card">
+    <p class="kicker">PEMINDAIAN TIKET</p>
     <div id="reader"></div>
-
-    <button id="btnMulai" onclick="mulaiScanner()">
-      📷 MULAI SCAN QR
-    </button>
-
-    <button id="btnStop" onclick="berhentiScanner()" disabled>
-      ⏹ BERHENTI SCAN
-    </button>
-  </div>
-
-  <div id="hasil"></div>
-
-  <div class="info">
-    DPW PARTAI NASDEM DKI JAKARTA<br>
-    NASDEM BUGAR BERBAGI – 8 NOVEMBER 2026
-  </div>
-
-</div>
-
+    <div class="actions">
+      <button id="btnMulai" type="button">📷 MULAI SCAN QR</button>
+      <button id="btnStop" class="secondary" type="button" disabled>BERHENTI SCAN</button>
+    </div>
+    <p class="small">Gunakan kamera belakang HP. Izinkan akses kamera ketika diminta browser. Website harus dibuka melalui HTTPS.</p>
+  </section>
+  <section id="hasil" role="status" aria-live="polite"></section>
+  <p class="statusnote">DPW PARTAI NASDEM DKI JAKARTA<br>NASDEM BUGAR BERBAGI · 8 NOVEMBER 2026</p>
+</main>
 <script>
-
-// GANTI URL INI DENGAN URL WEB APP APPS SCRIPT
+/*
+ * SETELAH Apps Script di-deploy sebagai Web App, tempel URL /exec
+ * pada API_URL di bawah. Jangan tempel URL /dev.
+ */
 const API_URL = "GANTI_DENGAN_URL_WEB_APP_APPS_SCRIPT";
-
 let scanner = null;
 let sedangMemproses = false;
 
+const btnMulai = document.getElementById("btnMulai");
+const btnStop = document.getElementById("btnStop");
+const hasil = document.getElementById("hasil");
 
-// MULAI SCANNER
+btnMulai.addEventListener("click", mulaiScanner);
+btnStop.addEventListener("click", berhentiScanner);
+
+function tampilHasil(tipe, judul, baris) {
+  hasil.className = tipe;
+  hasil.replaceChildren();
+
+  const h2 = document.createElement("h2");
+  h2.textContent = judul;
+  hasil.appendChild(h2);
+
+  baris.forEach(function(teks) {
+    const p = document.createElement("p");
+    p.textContent = teks;
+    hasil.appendChild(p);
+  });
+}
+
 async function mulaiScanner() {
+  if (scanner || sedangMemproses) return;
 
-  if (scanner) return;
+  if (!window.Html5Qrcode) {
+    tampilHasil("warning", "LIBRARY SCANNER GAGAL DIMUAT", [
+      "Periksa koneksi internet lalu muat ulang halaman."
+    ]);
+    return;
+  }
 
-  document.getElementById("btnMulai").disabled = true;
-  document.getElementById("btnStop").disabled = false;
+  if (!API_URL.startsWith("https://script.google.com/macros/s/") ||
+      !API_URL.endsWith("/exec")) {
+    tampilHasil("warning", "SCANNER BELUM TERHUBUNG", [
+      "URL Web App Apps Script belum dipasang pada konfigurasi API_URL."
+    ]);
+    return;
+  }
 
+  btnMulai.disabled = true;
+  btnStop.disabled = false;
   scanner = new Html5Qrcode("reader");
 
   try {
-
     await scanner.start(
       { facingMode: "environment" },
-      {
-        fps: 10,
-        qrbox: { width: 250, height: 250 },
-        aspectRatio: 1
-      },
+      { fps: 10, qrbox: { width: 240, height: 240 }, aspectRatio: 1 },
       qrBerhasil,
-      () => {}
+      function() {}
     );
-
-  } catch (error) {
-
-    tampilHasil(
-      "warning",
-      "KAMERA TIDAK DAPAT DIAKTIFKAN",
-      "Pastikan browser memiliki izin kamera dan website menggunakan HTTPS."
-    );
-
+    tampilHasil("warning", "KAMERA AKTIF", [
+      "Arahkan kamera ke QR Code tiket peserta."
+    ]);
+  } catch (err) {
     scanner = null;
-
-    document.getElementById("btnMulai").disabled = false;
-    document.getElementById("btnStop").disabled = true;
+    btnMulai.disabled = false;
+    btnStop.disabled = true;
+    tampilHasil("warning", "KAMERA TIDAK DAPAT DIAKTIFKAN", [
+      "Pastikan izin kamera diberikan dan halaman dibuka melalui HTTPS.",
+      String(err && err.message ? err.message : err)
+    ]);
   }
 }
 
-
-// SAAT QR BERHASIL DIBACA
 async function qrBerhasil(teksQR) {
-
   if (sedangMemproses) return;
-
   sedangMemproses = true;
-
   await berhentiScanner();
 
-  const kode = teksQR.trim();
+  const kode = String(teksQR || "").trim();
+  tampilHasil("warning", "MEMERIKSA TIKET...", ["Kode: " + kode]);
 
-  tampilHasil(
-    "warning",
-    "MEMERIKSA TIKET...",
-    "Kode: " + kode
-  );
+  const callbackName = "nbbCallback_" + Date.now();
+  let script = null;
+  let timeoutId = null;
+  let selesai = false;
 
-  // JSONP untuk menghindari masalah CORS GitHub Pages
-  const callbackName = "cbNBB_" + Date.now();
+  function bersihkan() {
+    if (selesai) return;
+    selesai = true;
+    clearTimeout(timeoutId);
+    delete window[callbackName];
+    if (script && script.parentNode) script.parentNode.removeChild(script);
+    sedangMemproses = false;
+  }
 
   window[callbackName] = function(data) {
+    bersihkan();
 
-    delete window[callbackName];
-
-    if (data.success && data.status === "VALID") {
-
-      tampilHasil(
-        "valid",
-        "✅ TIKET BERHASIL DITUKARKAN!",
-        "Nama: " + data.nama +
-        "<br>Kode Tiket: " + data.kode +
-        "<br>Waktu: " + data.waktu
-      );
-
-    } else if (data.status === "REDEEMED") {
-
-      tampilHasil(
-        "invalid",
-        "⛔ TIKET SUDAH DIGUNAKAN!",
-        "Nama: " + data.nama +
-        "<br>Kode Tiket: " + data.kode +
-        "<br>Waktu penukaran sebelumnya: " + data.waktu
-      );
-
-    } else if (data.status === "INVALID") {
-
-      tampilHasil(
-        "invalid",
-        "❌ TIKET TIDAK TERDAFTAR",
-        "Kode: " + kode
-      );
-
+    if (data && data.success && data.status === "VALID") {
+      tampilHasil("valid", "TIKET BERHASIL DITUKARKAN", [
+        "Nama: " + (data.nama || "-"),
+        "Kode tiket: " + (data.kode || kode),
+        "Waktu: " + (data.waktu || "-")
+      ]);
+    } else if (data && data.status === "REDEEMED") {
+      tampilHasil("invalid", "TIKET SUDAH DIGUNAKAN", [
+        "Nama: " + (data.nama || "-"),
+        "Kode tiket: " + (data.kode || kode),
+        "Penukaran sebelumnya: " + (data.waktu || "-")
+      ]);
+    } else if (data && data.status === "INVALID") {
+      tampilHasil("invalid", "TIKET TIDAK TERDAFTAR", ["Kode: " + kode]);
     } else {
-
-      tampilHasil(
-        "warning",
-        "⚠️ " + data.message,
+      tampilHasil("warning", "TIKET BELUM DAPAT DIPROSES", [
+        data && data.message ? data.message : "Respons server tidak dikenali.",
         "Kode: " + kode
-      );
+      ]);
     }
-
-    sedangMemproses = false;
   };
 
-  const script = document.createElement("script");
-
-  script.src =
-    API_URL +
-    "?kode=" + encodeURIComponent(kode) +
-    "&callback=" + callbackName;
-
+  script = document.createElement("script");
+  script.src = API_URL + "?kode=" + encodeURIComponent(kode) +
+    "&callback=" + encodeURIComponent(callbackName);
   script.onerror = function() {
-
-    delete window[callbackName];
-
-    tampilHasil(
-      "warning",
-      "KONEKSI GAGAL",
-      "Periksa internet dan URL Apps Script."
-    );
-
-    sedangMemproses = false;
+    bersihkan();
+    tampilHasil("warning", "KONEKSI KE DATABASE GAGAL", [
+      "Periksa URL Web App, deployment Apps Script, dan koneksi internet."
+    ]);
   };
+
+  timeoutId = setTimeout(function() {
+    bersihkan();
+    tampilHasil("warning", "SERVER TIDAK MERESPONS", [
+      "Coba lagi. Pastikan Web App Apps Script sudah di-deploy dengan akses yang sesuai."
+    ]);
+  }, 20000);
 
   document.body.appendChild(script);
 }
 
-
-// STOP SCANNER
 async function berhentiScanner() {
-
   if (scanner) {
-
-    try {
-      await scanner.stop();
-      scanner.clear();
-    } catch (error) {
-      console.log(error);
-    }
-
+    const instance = scanner;
     scanner = null;
+    try {
+      if (instance.isScanning) await instance.stop();
+      instance.clear();
+    } catch (err) {
+      console.warn("Gagal menghentikan kamera:", err);
+    }
   }
-
-  document.getElementById("btnMulai").disabled = false;
-  document.getElementById("btnStop").disabled = true;
+  btnMulai.disabled = false;
+  btnStop.disabled = true;
 }
-
-
-// TAMPILKAN HASIL VALIDASI
-function tampilHasil(tipe, judul, isi) {
-
-  const hasil = document.getElementById("hasil");
-
-  hasil.className = tipe;
-  hasil.style.display = "block";
-
-  hasil.innerHTML =
-    "<h2>" + judul + "</h2>" +
-    "<p>" + isi + "</p>";
-}
-
 </script>
-
 </body>
 </html>
-
