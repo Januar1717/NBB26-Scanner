@@ -51,11 +51,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
   <p class="statusnote">DPW PARTAI NASDEM DKI JAKARTA<br>NASDEM BUGAR BERBAGI · 8 NOVEMBER 2026</p>
 </main>
 <script>
-/*
- * SETELAH Apps Script di-deploy sebagai Web App, tempel URL /exec
- * pada API_URL di bawah. Jangan tempel URL /dev.
- */
-const API_URL = "GANTI_DENGAN_URL_WEB_APP_APPS_SCRIPT";
+const API_URL = "https://script.google.com/macros/s/AKfycbyKcxuy8Dqr5mxPh4cMuj3Y18VwkcOgc1LmjvtvWqgLi2PDMItGCtad4gRR21LQ3Ae8fg/exec";
 let scanner = null;
 let sedangMemproses = false;
 
@@ -69,11 +65,9 @@ btnStop.addEventListener("click", berhentiScanner);
 function tampilHasil(tipe, judul, baris) {
   hasil.className = tipe;
   hasil.replaceChildren();
-
   const h2 = document.createElement("h2");
   h2.textContent = judul;
   hasil.appendChild(h2);
-
   baris.forEach(function(teks) {
     const p = document.createElement("p");
     p.textContent = teks;
@@ -83,26 +77,15 @@ function tampilHasil(tipe, judul, baris) {
 
 async function mulaiScanner() {
   if (scanner || sedangMemproses) return;
-
   if (!window.Html5Qrcode) {
     tampilHasil("warning", "LIBRARY SCANNER GAGAL DIMUAT", [
       "Periksa koneksi internet lalu muat ulang halaman."
     ]);
     return;
   }
-
-  if (!API_URL.startsWith("https://script.google.com/macros/s/") ||
-      !API_URL.endsWith("/exec")) {
-    tampilHasil("warning", "SCANNER BELUM TERHUBUNG", [
-      "URL Web App Apps Script belum dipasang pada konfigurasi API_URL."
-    ]);
-    return;
-  }
-
   btnMulai.disabled = true;
   btnStop.disabled = false;
   scanner = new Html5Qrcode("reader");
-
   try {
     await scanner.start(
       { facingMode: "environment" },
@@ -128,7 +111,6 @@ async function qrBerhasil(teksQR) {
   if (sedangMemproses) return;
   sedangMemproses = true;
   await berhentiScanner();
-
   const kode = String(teksQR || "").trim();
   tampilHasil("warning", "MEMERIKSA TIKET...", ["Kode: " + kode]);
 
@@ -148,7 +130,6 @@ async function qrBerhasil(teksQR) {
 
   window[callbackName] = function(data) {
     bersihkan();
-
     if (data && data.success && data.status === "VALID") {
       tampilHasil("valid", "TIKET BERHASIL DITUKARKAN", [
         "Nama: " + (data.nama || "-"),
@@ -180,14 +161,12 @@ async function qrBerhasil(teksQR) {
       "Periksa URL Web App, deployment Apps Script, dan koneksi internet."
     ]);
   };
-
   timeoutId = setTimeout(function() {
     bersihkan();
     tampilHasil("warning", "SERVER TIDAK MERESPONS", [
       "Coba lagi. Pastikan Web App Apps Script sudah di-deploy dengan akses yang sesuai."
     ]);
   }, 20000);
-
   document.body.appendChild(script);
 }
 
