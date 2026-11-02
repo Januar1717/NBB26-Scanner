@@ -45,6 +45,16 @@ button:disabled{opacity:.45;cursor:not-allowed}
       <button id="btnMulai" type="button">📷 MULAI SCAN QR</button>
       <button id="btnStop" class="secondary" type="button" disabled>BERHENTI SCAN</button>
     </div>
+    <div style="margin-top:18px;border-top:1px solid #444;padding-top:16px">
+      <p class="kicker">INPUT KODE TIKET MANUAL</p>
+      <input id="inputKode" type="text" inputmode="text" autocomplete="off" autocapitalize="characters"
+        placeholder="Contoh: NBB-Umum-001"
+        style="width:100%;padding:14px;border:1px solid #555;border-radius:10px;background:#111;color:#fff;font-size:16px;text-transform:uppercase">
+      <div class="actions">
+        <button id="btnManual" type="button">⌨️ VALIDASI KODE TIKET</button>
+      </div>
+      <p class="small">Gunakan cara ini jika kamera tidak dapat digunakan. Pastikan kode tiket diketik dengan benar.</p>
+    </div>
     <p class="small">Gunakan kamera belakang HP. Izinkan akses kamera ketika diminta browser. Website harus dibuka melalui HTTPS.</p>
   </section>
   <section id="hasil" role="status" aria-live="polite"></section>
@@ -57,10 +67,27 @@ let sedangMemproses = false;
 
 const btnMulai = document.getElementById("btnMulai");
 const btnStop = document.getElementById("btnStop");
+const inputKode = document.getElementById("inputKode");
+const btnManual = document.getElementById("btnManual");
 const hasil = document.getElementById("hasil");
 
 btnMulai.addEventListener("click", mulaiScanner);
 btnStop.addEventListener("click", berhentiScanner);
+btnManual.addEventListener("click", async function() {
+  const kode = inputKode.value.trim().toUpperCase();
+  if (!kode) {
+    tampilHasil("warning", "KODE TIKET BELUM DIISI", ["Silakan ketik kode tiket peserta."]);
+    inputKode.focus();
+    return;
+  }
+  if (sedangMemproses) return;
+  btnManual.disabled = true;
+  await qrBerhasil(kode);
+  btnManual.disabled = false;
+});
+inputKode.addEventListener("keydown", function(event) {
+  if (event.key === "Enter") btnManual.click();
+});
 
 function tampilHasil(tipe, judul, baris) {
   hasil.className = tipe;
